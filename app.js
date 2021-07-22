@@ -16,7 +16,8 @@ app.post('/add', (req, res) => {
     students.push({
         id: req.body.id,
         name: req.body.name,
-        age: req.body.age
+        age: req.body.age,
+        email: req.body.email
     });
 
     return res.send("success");
@@ -32,9 +33,9 @@ app.get('/:searchBy/:value', (req, res) => {
     return res.send("student not found");
 });
 
-app.delete('/delete/:id/:value', (req, res) => {
+app.delete('/delete/:searchBy/:value', (req, res) => {
     for(let i = 0; i < students.length; ++i) {
-        if(students[i][req.params.id] === req.params.value) {
+        if(students[i][req.params.searchBy] === req.params.value) {
             delete students[i];
 
             return res.send("student deleted");
@@ -44,14 +45,14 @@ app.delete('/delete/:id/:value', (req, res) => {
     return res.send("student not found");
 });
 
-app.put('/update/:searchBy/:oldValue/:newValue', (req, res) => {
-    console.log(req.params);
+app.put('/update/:searchBy', (req, res) => {
     for(let i = 0; i < students.length; ++i) {
-        if(students[i][req.params.searchBy] === req.params.oldValue) {
-            students[i][req.params.searchBy] = req.params.newValue;
+        if(req.params.searchBy === students[i].email) {
+            for(let key in req.body) {
+                students[i][key] = req.body[key];
+            }
+            return res.send("success");
         }
-
-        return res.send("success");
     }
 
     return res.send("student not found");
