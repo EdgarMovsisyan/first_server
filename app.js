@@ -1,5 +1,6 @@
 const express = require("express");
 const bp = require('body-parser');
+const Student = require('./student.js');
 const app = express();
 const port = 3000;
 
@@ -9,34 +10,29 @@ app.use(bp.urlencoded({ extended: true }));
 const students = [];
 
 app.get('/', (req, res) => {
-    return res.send(students);
+    return res.send(Student.students);
 });
 
 app.post('/add', (req, res) => {
-    students.push({
-        id: req.body.id,
-        name: req.body.name,
-        age: req.body.age,
-        email: req.body.email
-    });
+     new Student(req.body.name, req.body.age, req.body.email).add();
 
     return res.send("success");
 });
 
-app.get('/:searchBy/:value', (req, res) => {
-    for(let i = 0; i < students.length; ++i) {
-        if(students[i][req.params.searchBy] === req.params.value) {
-            return res.send(students[i]);
+app.get('/search/:value', (req, res) => {
+    for(let i = 0; i < Student.students.length; ++i) {
+        if(req.params.value === Student.students[i].email) {
+            return res.send(Student.students[i]);
         }
     }
 
     return res.send("student not found");
 });
 
-app.delete('/delete/:searchBy/:value', (req, res) => {
-    for(let i = 0; i < students.length; ++i) {
-        if(students[i][req.params.searchBy] === req.params.value) {
-            delete students[i];
+app.delete('/delete/:value', (req, res) => {
+    for(let i = 0; i < Student.students.length; ++i) {
+        if(req.params.value === Student.students[i].email) {
+            delete Student.students[i];
 
             return res.send("student deleted");
         }
@@ -45,11 +41,11 @@ app.delete('/delete/:searchBy/:value', (req, res) => {
     return res.send("student not found");
 });
 
-app.put('/update/:searchBy', (req, res) => {
-    for(let i = 0; i < students.length; ++i) {
-        if(req.params.searchBy === students[i].email) {
+app.put('/update/:value', (req, res) => {
+    for(let i = 0; i < Student.students.length; ++i) {
+        if(req.params.value === Student.students[i].email) {
             for(let key in req.body) {
-                students[i][key] = req.body[key];
+                Student.students[i][key] = req.body[key];
             }
             return res.send("success");
         }
