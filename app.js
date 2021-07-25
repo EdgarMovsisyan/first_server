@@ -1,21 +1,20 @@
-const express = require("express");
+const express = require('express');
+const mongoose = require('mongoose');
 const bp = require('body-parser');
 const Student = require('./student.js');
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 
-const students = [];
 
 app.get('/', (req, res) => {
     return res.send(Student.students);
 });
 
 app.post('/add', (req, res) => {
-     new Student(req.body.name, req.body.age, req.body.email).add();
-
+    new Student(req.body.name, req.body.age, req.body.email).add();
     return res.send("success");
 });
 
@@ -54,6 +53,17 @@ app.put('/update/:value', (req, res) => {
     return res.send("student not found");
 });
 
-app.listen(port, () => {
-    console.log("localhost 3000");
-});
+(async function start() {
+    try {
+        await mongoose.connect(
+            'mongodb://localhost:27017/firstServer',
+            { useNewUrlParser: true, useUnifiedTopology: true }
+        );
+
+        app.listen(PORT, () => {
+            console.log("localhost 3000");
+        });
+    } catch {
+
+    }
+})();
